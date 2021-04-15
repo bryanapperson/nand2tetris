@@ -1,0 +1,13 @@
+/**
+ * Processing component of a parallel prefix adder
+ */
+
+CHIP Calculator {
+    IN gi, gprev, pi, pprev;    // 1-bit inputs
+    OUT g, p;    // 1-bit outputs
+
+    PARTS:
+        And(a=pi, b=gprev, out=piAndgprev);
+        Or(a=piAndgprev, b=gi, out=g);
+        And(a=pi, b=pprev, out=p);
+}

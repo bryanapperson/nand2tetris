@@ -1,0 +1,11 @@
+/**
+ * Pre processing component of a parallel prefix adder
+ */
+
+CHIP Postcalculator {
+    IN pi, cprev;    // 1-bit inputs
+    OUT si;   // 1-bit outputs
+
+    PARTS:
+        Xor(a=pi, b=cprev, out=si);
+}

@@ -1,0 +1,98 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Adder16.hdl
+/**
+ * 16-bit Han Carlson Parallel Prefix Adder
+ *
+ * Adds two 16-bit values.
+ * The most-significant carry bit is ignored.
+ *
+ * Links:
+ *     http://www.aoki.ecei.tohoku.ac.jp/arith/mg/algorithm.html#fsa_pfx
+ *     http://users.encs.concordia.ca/~asim/COEN_6501/Lecture_Notes/Parallel%20prefix%20adders%20presentation.pdf
+ *     https://en.wikipedia.org/wiki/Kogge%E2%80%93Stone_adder
+ *
+ */
+
+
+CHIP Add16 {
+    IN a[16], b[16]; // 2 16-bit input busses
+    OUT out[16]; // 16 bit output bus
+
+    PARTS:
+       // Precalulate
+       Precalculator(a=a[0], b=b[0], g=g0, p=p0, p=out[0]);
+       Precalculator(a=a[1], b=b[1], g=g1, p=p1);
+       Precalculator(a=a[2], b=b[2], g=g2, p=p2);
+       Precalculator(a=a[3], b=b[3], g=g3, p=p3);
+       Precalculator(a=a[4], b=b[4], g=g4, p=p4);
+       Precalculator(a=a[5], b=b[5], g=g5, p=p5);
+       Precalculator(a=a[6], b=b[6], g=g6, p=p6);
+       Precalculator(a=a[7], b=b[7], g=g7, p=p7);
+       Precalculator(a=a[8], b=b[8], g=g8, p=p8);
+       Precalculator(a=a[9], b=b[9], g=g9, p=p9);
+       Precalculator(a=a[10], b=b[10], g=g10, p=p10);
+       Precalculator(a=a[11], b=b[11], g=g11, p=p11);
+       Precalculator(a=a[12], b=b[12], g=g12, p=p12);
+       Precalculator(a=a[13], b=b[13], g=g13, p=p13);
+       Precalculator(a=a[14], b=b[14], g=g14, p=p14);
+       Precalculator(a=a[15], b=b[15], g=g15, p=p15);
+       // Calculate Carries
+       // Propogate does need to be connected for the last stage
+       // of a given bit
+       // Stage 1
+       Calculator(gi=g1, gprev=g0, pi=p1, pprev=p0, g=g1g0, p=p1p0);
+       Calculator(gi=g3, gprev=g2, pi=p3, pprev=p2, g=g3g2, p=p3p2);
+       Calculator(gi=g5, gprev=g4, pi=p5, pprev=p4, g=g5g4, p=p5p4);
+       Calculator(gi=g7, gprev=g6, pi=p7, pprev=p6, g=g7g6, p=p7p6);
+       Calculator(gi=g9, gprev=g8, pi=p9, pprev=p8, g=g9g8, p=p9p8);
+       Calculator(gi=g11, gprev=g10, pi=p11, pprev=p10, g=g11g10, p=p11p10);
+       Calculator(gi=g13, gprev=g12, pi=p13, pprev=p12, g=g13g12, p=p13p12);
+       Calculator(gi=g15, gprev=g14, pi=p15, pprev=p14, g=g15g14, p=p15p14);
+       // Stage 2
+       Calculator(gi=g3g2, gprev=g1g0, pi=p3p2, pprev=p1p0, g=g3g1, p=p3p1);
+       Calculator(gi=g5g4, gprev=g3g2, pi=p5p4, pprev=p3p2, g=g5g3, p=p5p3);
+       Calculator(gi=g7g6, gprev=g5g4, pi=p7p6, pprev=p5p4, g=g7g5, p=p7p5);
+       Calculator(gi=g9g8, gprev=g7g6, pi=p9p8, pprev=p7p6, g=g9g7, p=p9p7);
+       Calculator(gi=g11g10, gprev=g9g8, pi=p11p10, pprev=p9p8, g=g11g9, p=p11p9);
+       Calculator(gi=g13g12, gprev=g11g10, pi=p13p12, pprev=p11p10, g=g13g11, p=p13p11);
+       Calculator(gi=g15g14, gprev=g13g12, pi=p15p14, pprev=p13p12, g=g15g13, p=p15p13);
+       // Stage 3
+       Calculator(gi=g5g3, gprev=g1g0, pi=p5p3, pprev=p1p0, g=g5g1, p=p5p1);
+       Calculator(gi=g7g5, gprev=g3g1, pi=p7p5, pprev=p3p1, g=g7g3, p=p7p3);
+       Calculator(gi=g9g7, gprev=g5g3, pi=p9p7, pprev=p5p3, g=g9g5, p=p9p5);
+       Calculator(gi=g11g9, gprev=g7g5, pi=p11p9, pprev=p7p5, g=g11g7, p=p11p7);
+       Calculator(gi=g13g11, gprev=g9g7, pi=p13p11, pprev=p9p7, g=g13g9, p=p13p9);
+       Calculator(gi=g15g13, gprev=g11g9, pi=p15p13, pprev=p11p9, g=g15g11, p=p15p11);
+       // Stage 4
+       Calculator(gi=g9g5, gprev=g1g0, pi=p9p5, pprev=p1p0, g=g9g1, p=p9p1);
+       Calculator(gi=g11g7, gprev=g3g1, pi=p11p7, pprev=p3p1, g=g11g3, p=p11p3);
+       Calculator(gi=g13g9, gprev=g5g1, pi=p13p9, pprev=p5p1, g=g13g5, p=p13p5);
+       Calculator(gi=g15g11, gprev=g7g3, pi=p15p11, pprev=p7p3, g=g15g7, p=p15p7);
+       // Stage 5
+       Calculator(gi=g2, gprev=g1g0, pi=p2, pprev=p1p0, g=g2g1, p=p2p1);
+       Calculator(gi=g4, gprev=g3g1, pi=p4, pprev=p3p1, g=g4g3, p=p4p3);
+       Calculator(gi=g6, gprev=g5g1, pi=p6, pprev=p5p1, g=g6g5, p=p6p5);
+       Calculator(gi=g8, gprev=g7g3, pi=p8, pprev=p7p3, g=g8g7, p=p8p7);
+       Calculator(gi=g10, gprev=g9g1, pi=p10, pprev=p9p1, g=g10g9, p=p10p9);
+       Calculator(gi=g12, gprev=g11g3, pi=p12, pprev=p11p3, g=g12g11, p=p12p11);
+       Calculator(gi=g14, gprev=g13g5, pi=p14, pprev=p13p5, g=g14g13, p=p14p13);
+       // Sum
+       // cprev = Gi - 1
+       Postcalculator(pi=p1, cprev=g0, si=out[1]);
+       Postcalculator(pi=p2, cprev=g1g0, si=out[2]);
+       Postcalculator(pi=p3, cprev=g2g1, si=out[3]);
+       Postcalculator(pi=p4, cprev=g3g1, si=out[4]);
+       Postcalculator(pi=p5, cprev=g4g3, si=out[5]);
+       Postcalculator(pi=p6, cprev=g5g1, si=out[6]);
+       Postcalculator(pi=p7, cprev=g6g5, si=out[7]);
+       Postcalculator(pi=p8, cprev=g7g3, si=out[8]);
+       Postcalculator(pi=p9, cprev=g8g7, si=out[9]);
+       Postcalculator(pi=p10, cprev=g9g1, si=out[10]);
+       Postcalculator(pi=p11, cprev=g10g9, si=out[11]);
+       Postcalculator(pi=p12, cprev=g11g3, si=out[12]);
+       Postcalculator(pi=p13, cprev=g12g11, si=out[13]);
+       Postcalculator(pi=p14, cprev=g13g5, si=out[14]);
+       Postcalculator(pi=p15, cprev=g14g13, si=out[15]);
+}  
